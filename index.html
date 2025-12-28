@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="en" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculator</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body {
+      box-sizing: border-box;
+    }
+    
+    html, body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+  </style>
+  <style>@view-transition { navigation: auto; }</style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
+ </head>
+ <body class="h-full">
+  <div id="app" class="w-full h-full overflow-auto bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
+   <div class="flex items-center justify-center min-h-full p-6">
+    <div class="w-full max-w-sm">
+     <h1 class="text-center mb-6 font-bold text-4xl text-white">Calculator</h1>
+     <div class="bg-slate-800 rounded-2xl shadow-2xl p-6">
+      <div class="bg-slate-900 rounded-xl p-6 mb-6 text-right">
+       <div id="display" class="text-5xl font-bold break-all text-white min-h-[60px] flex items-center justify-end">
+        0
+       </div>
+      </div>
+      <div class="grid grid-cols-4 gap-3"><button data-action="clear" class="col-span-2 rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-red-600 text-white">C</button> <button data-action="backspace" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-slate-600 text-white">⌫</button> <button data-action="operator" data-value="÷" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-orange-500 text-white">÷</button> <button data-action="number" data-value="7" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-slate-700 text-white">7</button> <button data-action="number" data-value="8" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-slate-700 text-white">8</button> <button data-action="number" data-value="9" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-slate-700 text-white">9</button> <button data-action="operator" data-value="×" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-orange-500 text-white">×</button> <button data-action="number" data-value="4" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-slate-700 text-white">4</button> <button data-action="number" data-value="5" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-slate-700 text-white">5</button> <button data-action="number" data-value="6" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-slate-700 text-white">6</button> <button data-action="operator" data-value="-" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-orange-500 text-white">-</button> <button data-action="number" data-value="1" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-slate-700 text-white">1</button> <button data-action="number" data-value="2" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-slate-700 text-white">2</button> <button data-action="number" data-value="3" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-slate-700 text-white">3</button> <button data-action="operator" data-value="+" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-orange-500 text-white">+</button> <button data-action="number" data-value="0" class="col-span-2 rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-slate-700 text-white">0</button> <button data-action="decimal" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-slate-700 text-white">.</button> <button data-action="equals" class="rounded-xl py-4 font-semibold text-lg transition-all duration-200 hover:opacity-80 active:scale-95 bg-blue-600 text-white">=</button>
+      </div>
+     </div>
+     <div class="text-center mt-6 text-slate-300 text-sm">
+      <p>Ready to publish on GitHub Pages</p>
+     </div>
+    </div>
+   </div>
+  </div>
+  <script>
+    let currentValue = "0";
+    let previousValue = null;
+    let operation = null;
+    let shouldResetDisplay = false;
+
+    const display = document.getElementById("display");
+
+    function updateDisplay() {
+      display.textContent = currentValue;
+    }
+
+    function handleNumber(num) {
+      if (shouldResetDisplay) {
+        currentValue = num;
+        shouldResetDisplay = false;
+      } else {
+        currentValue = currentValue === "0" ? num : currentValue + num;
+      }
+      updateDisplay();
+    }
+
+    function handleOperator(op) {
+      if (previousValue !== null && operation !== null && !shouldResetDisplay) {
+        calculate();
+      }
+      previousValue = currentValue;
+      operation = op;
+      shouldResetDisplay = true;
+    }
+
+    function calculate() {
+      if (previousValue === null || operation === null) return;
+
+      const prev = parseFloat(previousValue);
+      const current = parseFloat(currentValue);
+      let result;
+
+      switch (operation) {
+        case "+":
+          result = prev + current;
+          break;
+        case "-":
+          result = prev - current;
+          break;
+        case "×":
+          result = prev * current;
+          break;
+        case "÷":
+          result = current !== 0 ? prev / current : "Error";
+          break;
+        default:
+          return;
+      }
+
+      currentValue = result === "Error" ? result : String(result);
+      previousValue = null;
+      operation = null;
+      shouldResetDisplay = true;
+      updateDisplay();
+    }
+
+    function handleClear() {
+      currentValue = "0";
+      previousValue = null;
+      operation = null;
+      shouldResetDisplay = false;
+      updateDisplay();
+    }
+
+    function handleDecimal() {
+      if (shouldResetDisplay) {
+        currentValue = "0.";
+        shouldResetDisplay = false;
+      } else if (!currentValue.includes(".")) {
+        currentValue += ".";
+      }
+      updateDisplay();
+    }
+
+    function handleBackspace() {
+      if (currentValue.length > 1) {
+        currentValue = currentValue.slice(0, -1);
+      } else {
+        currentValue = "0";
+      }
+      updateDisplay();
+    }
+
+    // Add event listeners to all buttons
+    document.querySelectorAll('[data-action]').forEach(button => {
+      button.addEventListener('click', (e) => {
+        const action = e.target.dataset.action;
+        const value = e.target.dataset.value;
+
+        switch (action) {
+          case 'number':
+            handleNumber(value);
+            break;
+          case 'operator':
+            handleOperator(value);
+            break;
+          case 'equals':
+            calculate();
+            break;
+          case 'clear':
+            handleClear();
+            break;
+          case 'decimal':
+            handleDecimal();
+            break;
+          case 'backspace':
+            handleBackspace();
+            break;
+        }
+      });
+    });
+
+    // Keyboard support
+    document.addEventListener('keydown', (e) => {
+      if (e.key >= '0' && e.key <= '9') {
+        handleNumber(e.key);
+      } else if (e.key === '.') {
+        handleDecimal();
+      } else if (e.key === '+' || e.key === '-' || e.key === '*' || e.key === '/') {
+        const op = e.key === '*' ? '×' : e.key === '/' ? '÷' : e.key;
+        handleOperator(op);
+      } else if (e.key === 'Enter' || e.key === '=') {
+        calculate();
+      } else if (e.key === 'Escape' || e.key === 'c' || e.key === 'C') {
+        handleClear();
+      } else if (e.key === 'Backspace') {
+        handleBackspace();
+      }
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9b535d0424d00707',t:'MTc2Njk0OTA4NS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+  </html>
